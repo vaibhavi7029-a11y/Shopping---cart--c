@@ -1,4 +1,4 @@
-# Shopping-cart-c Shopping Cart System in C
+Shopping Cart System in C
 
 📌 Project Description
 
