@@ -1,137 +1,159 @@
 #include <stdio.h>
 #include <string.h>
 
-struct Product {
-    int id;
-    char name[30];
-    float price;
-};
-
-struct Cart {
-    int id;
-    char name[30];
+struct Item {
+    char name[50];
     float price;
     int quantity;
 };
 
-struct Product products[5] = {
-    {1,"Laptop",50000},
-    {2,"Mobile",20000},
-    {3,"Headphones",2000},
-    {4,"Keyboard",1500},
-    {5,"Mouse",800}
-};
-
-struct Cart cart[50];
+struct Item cart[100];
 int count = 0;
 
-void productList() {
-    printf("\nAvailable Products\n");
-    printf("-----------------------\n");
+void addItem() {
+    printf("\nEnter Item Name: ");
+    scanf("%s", cart[count].name);
 
-    for(int i=0;i<5;i++) {
-        printf("%d %s Rs %.2f\n",products[i].id,products[i].name,products[i].price);
-    }
-}
-
-void addToCart() {
-    int id,qty;
-
-    productList();
-
-    printf("\nEnter Product ID: ");
-    scanf("%d",&id);
+    printf("Enter Price: ");
+    scanf("%f", &cart[count].price);
 
     printf("Enter Quantity: ");
-    scanf("%d",&qty);
+    scanf("%d", &cart[count].quantity);
 
-    for(int i=0;i<5;i++) {
-        if(products[i].id==id) {
-            cart[count].id=id;
-            strcpy(cart[count].name,products[i].name);
-            cart[count].price=products[i].price;
-            cart[count].quantity=qty;
-            count++;
-        }
-    }
-
-    printf("Product added to cart\n");
+    count++;
+    printf("\nItem added successfully!\n");
 }
 
 void viewCart() {
-    printf("\nItems in Cart\n");
+    if (count == 0) {
+        printf("\nCart is empty!\n");
+        return;
+    }
 
-    for(int i=0;i<count;i++) {
-        printf("%s  Price: %.2f  Qty: %d\n",
-        cart[i].name,cart[i].price,cart[i].quantity);
+    printf("\n------ Shopping Cart ------\n");
+    for (int i = 0; i < count; i++) {
+        printf("%d. %s | Price: %.2f | Quantity: %d | Total: %.2f\n",
+        i + 1,
+        cart[i].name,
+        cart[i].price,
+        cart[i].quantity,
+        cart[i].price * cart[i].quantity);
     }
 }
 
-void bill() {
-    float total=0;
+void removeItem() {
+    int index;
 
-    printf("\n------ BILL RECEIPT ------\n");
-
-    for(int i=0;i<count;i++) {
-        float cost=cart[i].price*cart[i].quantity;
-
-        printf("%s x %d = %.2f\n",
-        cart[i].name,cart[i].quantity,cost);
-
-        total+=cost;
+    if (count == 0) {
+        printf("\nCart is empty!\n");
+        return;
     }
 
-    printf("-------------------------\n");
-    printf("Total Amount = %.2f\n",total);
+    viewCart();
+    printf("\nEnter item number to remove: ");
+    scanf("%d", &index);
+
+    if (index < 1 || index > count) {
+        printf("\nInvalid item number!\n");
+        return;
+    }
+
+    for (int i = index - 1; i < count - 1; i++) {
+        cart[i] = cart[i + 1];
+    }
+
+    count--;
+    printf("\nItem removed successfully!\n");
 }
 
-int login() {
-    char user[20],pass[20];
+void updateQuantity() {
+    int index, qty;
 
-    printf("Username: ");
-    scanf("%s",user);
+    if (count == 0) {
+        printf("\nCart is empty!\n");
+        return;
+    }
 
-    printf("Password: ");
-    scanf("%s",pass);
+    viewCart();
+    printf("\nEnter item number to update quantity: ");
+    scanf("%d", &index);
 
-    if(strcmp(user,"admin")==0 && strcmp(pass,"1234")==0)
-        return 1;
-    else
-        return 0;
+    if (index < 1 || index > count) {
+        printf("\nInvalid item number!\n");
+        return;
+    }
+
+    printf("Enter new quantity: ");
+    scanf("%d", &qty);
+
+    cart[index - 1].quantity = qty;
+    printf("\nQuantity updated successfully!\n");
+}
+
+void checkout() {
+    float total = 0;
+
+    if (count == 0) {
+        printf("\nCart is empty!\n");
+        return;
+    }
+
+    printf("\n========== BILL RECEIPT ==========\n");
+
+    for (int i = 0; i < count; i++) {
+        float itemTotal = cart[i].price * cart[i].quantity;
+        printf("%s x %d = %.2f\n", cart[i].name, cart[i].quantity, itemTotal);
+        total += itemTotal;
+    }
+
+    printf("----------------------------------\n");
+    printf("Total Bill = %.2f\n", total);
+    printf("Thank you for shopping!\n");
 }
 
 int main() {
-
     int choice;
 
-    if(!login()) {
-        printf("Login Failed\n");
-        return 0;
-    }
+    while (1) {
+        printf("\n===== SHOPPING CART SYSTEM =====\n");
+        printf("1. Add Item\n");
+        printf("2. View Cart\n");
+        printf("3. Remove Item\n");
+        printf("4. Update Quantity\n");
+        printf("5. Checkout\n");
+        printf("6. Exit\n");
 
-    printf("Login Successful\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
 
-    while(1) {
+        switch (choice) {
 
-        printf("\n---- MENU ----\n");
-        printf("1 View Products\n");
-        printf("2 Add To Cart\n");
-        printf("3 View Cart\n");
-        printf("4 Generate Bill\n");
-        printf("5 Exit\n");
+        case 1:
+            addItem();
+            break;
 
-        printf("Enter Choice: ");
-        scanf("%d",&choice);
+        case 2:
+            viewCart();
+            break;
 
-        switch(choice) {
+        case 3:
+            removeItem();
+            break;
 
-            case 1: productList(); break;
-            case 2: addToCart(); break;
-            case 3: viewCart(); break;
-            case 4: bill(); break;
-            case 5: return 0;
-            default: printf("Invalid Choice\n");
+        case 4:
+            updateQuantity();
+            break;
 
+        case 5:
+            checkout();
+            break;
+
+        case 6:
+            printf("\nExiting program...\n");
+            return 0;
+
+        default:
+            printf("\nInvalid choice! Try again.\n");
         }
     }
 
